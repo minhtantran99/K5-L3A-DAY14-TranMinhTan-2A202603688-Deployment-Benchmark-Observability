@@ -142,8 +142,9 @@ Kết quả test qua Nginx (`http://localhost`):
 
 ### Exercise 3.1 / 3.2: Deploy Agent Part 6 lên Cloud & So sánh `railway.toml` vs `render.yaml`
 
-- **URL public (Agent Part 6):** `<PENDING_CLOUD_DEPLOY_URL>` *(cập nhật ngay sau bước deploy ở CP6)*
+- **URL public (Agent Part 6):** `https://agent-production-0643c5b4.up.railway.app`
 - **Screenshots:** `screenshots/dashboard.png`, `screenshots/running.png`, `screenshots/test.png`
+- **Kiểm tra 4 lệnh CP6:** `/health` → `200`, `/ready` → `200`, `/ask` không key → `401`, `/ask` có `X-API-Key` → `200`; `python check_production_ready.py --public-url https://agent-production-0643c5b4.up.railway.app` → `PASS 12/12 (44/44 checks passed)`.
 
 **So sánh `railway.toml` vs `render.yaml`:**
 
@@ -394,3 +395,7 @@ Chạy `python check_production_ready.py` trong `06-lab-complete/` (môi trườ
    - *Hỏi gì:* Đối chiếu các anti-pattern ở `01-localhost-vs-production`, so sánh `railway.toml` và `render.yaml`, phân tích pipeline `cloudbuild.yaml`/`service.yaml`.
    - *Nhận gì:* Bảng tổng hợp các tiêu chí 12-Factor, cơ chế sliding-window trong `rate_limiter.py` và cấu trúc multi-stage Docker.
    - *Tự sửa & tự kiểm tra:* Tự chạy toàn bộ server và stack Docker mẫu (`01` develop/production, `02` docker build & compose, `04` API key & JWT rate limit 429, `05` `--scale agent=3` + `test_stateless.py`), tự đo kích thước image (`1.67 GB` vs `240 MB`) và dán kết quả thực tế vào bài.
+3. **Part 3 & Part 7 — Deploy Railway và Benchmark / Observability:**
+   - *Hỏi gì:* Khắc phục lỗi thiếu `PYTHONUSERBASE` trong Dockerfile observability stack, viết CI workflow quality gate (`.github/workflows/eval.yml`), bổ sung `KNOWLEDGE_BASE` trong `mock_llm.py`, và cấu hình deploy `06-lab-complete/` + Redis lên Railway.
+   - *Nhận gì:* Sửa `ENV PYTHONUSERBASE=/home/agent/.local` giúp agent container chạy ổn định; thêm metric `agent_question_length_chars` và 2 entry `KNOWLEDGE_BASE` (`hpa`/`jwt`).
+   - *Tự sửa & tự kiểm tra:* Tự chạy toàn bộ `load_test.py`, `eval/run_eval.py` (đạt 100%, 0 regression), Locust `scale_1` & `scale_3`, `promtool test rules`, thí nghiệm chaos A–E đo thời gian firing thật, và kiểm chứng URL public trên Railway bằng `check_production_ready.py --public-url` đạt `44/44 checks passed`.
